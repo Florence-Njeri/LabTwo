@@ -13,8 +13,9 @@ int main(int argc, char * argv[]) {
         check = validate(argv);
         if (check == 0) {
             puts("\nChecking values");
-            in0   = atoi(argv[2]);
-            in1   = atoi(argv[1]);
+            // Use strtol with error checking since atoi is deprecatted
+            in0   = strol(argv[2]);
+            in1   = strol(argv[1]);
             check = fnchck(in1, in0);
             if (check == 0xf) {
                 fngrt();

@@ -2,8 +2,8 @@ CC = gcc
 
 DEBUGFLAGS = -fdebug-prefix-map=$(CURDIR)=. -ggdb
 BASECFLAGS = -O1 -Wextra -Wall -Isrc/validation -Isrc/action
-LEGCFLAGS  = # To be filled
-LEGLDFLAGS = # To be filled
+LEGCFLAGS  = -fPIE, -fno-stack-protector, -D_FORTIFY_SOURCE=0, -Wl,-z,relro 
+LEGLDFLAGS = -pie -Wl,-z,relro -Wl,-z,lazy -Wl,-z,noexecstack 
 
 CFLAGS  = $(BASECFLAGS) $(DEBUGFLAGS) $(LEGCFLAGS)
 LDFLAGS = $(LEGLDFLAGS)

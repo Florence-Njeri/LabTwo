@@ -55,7 +55,7 @@ I then manually analyzed the `Makefile` to try and identify what the compiler fl
 ## Explain which should be removed and how it will enhance security,
 ## Find et report the problematic lines in the source code,
 
-## Patch the vulnerabilities in the code, and provide the patch with comments,
+## How to patch the vulnerabilities above
 
 The source code below is the patched code of `validation_functions.c`
 
@@ -130,7 +130,46 @@ void fnR(void) {
 
 The code snippet above shows the solution which adds the `ifdef IGNORE_FUNCTION` where `IGNORE_FUNCTION` is the flag we will pass to the compiler using the `-D` flag. This is the complete compilation command to use `-DIGNORE_FUNCTION`
 
-## Report on future processes that may prevent such mistakes.
+In the `main.c` function, the `atoi()` function, which converts user input to an integer, has been deprecated. It also does not check for errors before converting the string to an integer. In the `door-locker` program, if the user inputs two different strings as input, the door would open. This vulnerability exists because we are using `atoi()`. To fix this vulnerability, we replaced the `atoi()` function with the `strtol()` function, which will throw an error if the input isn't a valid number, as shown in the patched code below.
+
+```C
+#include <stdio.h>
+#include <stdlib.h>
+
+#include "action_functions.h"
+#include "validation_functions.h"
+
+int main(int argc, char * argv[]) {
+    int check;
+    int in0;
+    int in1;
+
+    if (argc == 3) {
+        check = validate(argv);
+        if (check == 0) {
+            puts("\nChecking values");
+            // Use strtol with error checking since atoi is deprecatted
+            in0   = strol(argv[2]);
+            in1   = strol(argv[1]);
+            check = fnchck(in1, in0);
+            if (check == 0xf) {
+                fngrt();
+            } else {
+                fnr();
+            }
+        } else {
+            fnr();
+        }
+        check = 0;
+    } else {
+        puts("Usage : client <chiffre0> <chiffre1>");
+        check = 1;
+    }
+    return check;
+}
+```
+
+## How to avoid these mistakes in future.
 The vulnerabilities identified and addressed in the source code highlight some of the security concerns we can introduce to our code. Below is a detailed plan of future the software development process to mitigate such mistakes before the code is released:
 **Use Secure Coding Practices**
 
@@ -143,7 +182,7 @@ The vulnerabilities identified and addressed in the source code highlight some o
 
 - Peer review all new code for adherence to security guidelines.
 - Use static analysis tools (e.g., SonarQube, Coverity) to identify vulnerabilities such as buffer overflows or use of unsafe functions.
-- Periodically review older code to find unused functions, insecure patterns, and deprecated APIs and dependencies.
+- Periodically review older code to find unused functions, insecure patterns, and deprecated APIs, functions and dependencies and update them to the recommended functions.
 - Remove unused functions or ensure they are excluded from compilation (e.g., through macros using `ifdef`).
 
 **Enable Compiler Flags for Security**
